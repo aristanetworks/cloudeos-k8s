@@ -21,15 +21,10 @@ metadata:
 data:
   # Add any Arista config fragment here without any terminating "end"
   startupconfig-data: |-
-      ! This is inserted from raw data in yamlfile
-      agent lldp shutdown
-      ip routing ipv6 interfaces
-      service routing protocols model multi-agent
-      interface defaults
-      mtu 9000
-      router bgp 65130
-         neighbor 172.24.72.192 remote-as 65130
       !
+    management api gnmi
+       transport grpc default
+    !
 ---
 apiVersion: apps/v1
 kind: DaemonSet
