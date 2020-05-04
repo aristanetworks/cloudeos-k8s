@@ -16,10 +16,24 @@ Cilium 1.7 or later
 
 # How To Deploy
 
-- Deploy Cilium following the [Cilium guide](https://cilium.readthedocs.io/en/stable/gettingstarted/k8s-install-default/)
-- Download and make any desired changes to `cloudeos-cilium.yaml`
-- Apply node annotations if desired
-- Deploy `cloudeos-cilium.yaml`
+- Deploy Cilium following the [Cilium guide](https://cilium.readthedocs.io/en/stable/gettingstarted/k8s-install-default/), but instead of deploying the YAML file directly, download it to your local machine to make changes
+- Edit the YAML file entry to remove overlay:
+
+```
+  # Encapsulation mode for communication between nodes
+  # Possible values:
+  #   - disabled
+  #   - vxlan (default)
+  #   - geneve
+  tunnel: disabled
+```
+- Deploy the Cilium YAML file.  (i.e. `kubectl apply -f quick-install.yaml`)
+
+- Apply node annotations if desired (see root page of repo.  It is suggested to annotate with BGP settings)
+- Download the `cloudeos-cilium.yaml` file located in this directory
+- Make any needed changes to the example yaml file
+- Deploy the cloudeos yaml file:
+
 ```
     kubectl apply -f cloudeos-cilium.yaml
 ``` 
