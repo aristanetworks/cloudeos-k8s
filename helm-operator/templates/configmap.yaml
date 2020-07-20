@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudeos-configmap
+  namespace: {{ .Values.daemonset.namepace }}
+data:
+  startupconfig-data: |-
+  {{ (.Files.Glob "startupconfig.txt").AsConfig | indent 2 }}

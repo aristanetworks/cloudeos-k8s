@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  cloudeos:
+  - apiVersion: v2
+    created: "2020-07-07T17:50:05.132986418Z"
+    description: A cloudeos deployment for kubernetes
+    digest: 6f1d8dacd978605db04e6b71d1f8d3607ebdfe0534fea3240a144851a36a4a16
+    name: cloudeos
+    sources:
+    - https://github.com/aristanetworks/cloudeos-k8s/helm-operator
+    type: application
+    urls:
+    - cloudeos-0.0.1.tgz
+    version: 0.0.1
+generated: "2020-07-07T17:50:05.132216436Z"

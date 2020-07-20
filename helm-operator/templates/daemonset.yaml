@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.daemonset.name }}
+  namespace: {{ .Values.daemonset.namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: cloudeos
+  template:
+    metadata:
+      labels:
+        app: cloudeos
+    spec:
+      hostNetwork: true
+      nodeSelector:
+         beta.kubernetes.io/os: linux
+      initContainers:
+      - image: {{ .Values.daemonset.initcontainer }}
+        name: ceosr-init
+        command: ["/ceosr-init"]
+        env:
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: "DATASTORE_TYPE"
+            value: "kubernetes"
+          - name: "CNI_PROVIDER"
+            value: "cilium"
+
+        volumeMounts:
+
+        - name: startupconfig-data
+          mountPath: /config-data/
+          readOnly: false
+        - name: k8shostcnipath
+          mountPath: /opt_cni_bin
+          readOnly: false
+        - name: k8shostpluginpath
+          mountPath: /etc_cni_net.d
+          readOnly: false
+        - name: cloudeos-mnt-dir
+          mountPath: /mnt/flash
+          readOnly: false
+
+      containers:
+      - image: {{ .Values.daemonset.containername }}
+        name: cloudeos
+        command: ["/sbin/init"]
+        args: ["systemd.setenv=EOS_PLATFORM=veos", "systemd.setenv=container=docker"]
+        stdin: true
+        tty: true
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: "EOS_PLATFORM"
+          value: "veos"
+        - name: "container"
+          value: "docker"
+
+        securityContext:
+          privileged: true
+
+        volumeMounts:
+        - name: cloudeos-mnt-dir
+          mountPath: /mnt/flash
+          readOnly: false
+        - name: cloudeos-hotplug-dir
+          mountPath: /cloudeos
+          readOnly: false
+
+
+      volumes:
+      - name: startupconfig-data
+        configMap:
+          defaultMode: 0777
+          name: cloudeos-configmap
+      - name: k8shostcnipath
+        hostPath:
+          path: /opt/cni/bin
+          type: Directory
+      - name: k8shostpluginpath
+        hostPath:
+          path: /etc/cni/net.d
+          type: Directory
+      - name: cloudeos-mnt-dir
+        hostPath:
+          path: /cloudeos/mnt/
+          type: DirectoryOrCreate
+      - name: cloudeos-hotplug-dir
+        hostPath:
+          path: /cloudeos/hotplug/
+          type: DirectoryOrCreate
